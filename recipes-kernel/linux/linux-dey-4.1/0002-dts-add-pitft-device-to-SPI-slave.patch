@@ -1,0 +1,73 @@
+From 3629621ee6c5bcd84fa56dd19355383a3b659e82 Mon Sep 17 00:00:00 2001
+From: Yusuke Mitsuki <mickey.happygolucky@gmail.com>
+Date: Fri, 27 Jan 2017 23:37:22 +0900
+Subject: [PATCH 2/3] dts: add pitft device to SPI slave
+
+---
+ arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts | 22 ++++++++++++++++------
+ arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi      |  6 ++++++
+ 2 files changed, 22 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts
+index e1000a3..acdba12 100644
+--- a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts
++++ b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts
+@@ -29,7 +29,7 @@
+ 	 * There are no SPI slave devices on the SBC.
+ 	 * Enable if adding your slave devices below.
+ 	 */
+-	//status = "okay";
++	status = "okay";
+ 
+ 	/* Add your slave devices here. Next is an example of spidev. */
+ 	//spidev@0 {
+@@ -37,14 +37,24 @@
+ 	//	compatible = "spidev";
+ 	//	spi-max-frequency = <1000000>;
+ 	//};
+-};
+ 
+-&fec1 {
+-	status = "okay";
++	pitft: pitft@0{
++                compatible = "himax,hx8357d";
++                reg = <0>;
++                pinctrl-names = "default";
++                pinctrl-0 = <&pinctrl_pitft>;
++
++                spi-max-frequency = <32000000>;
++                rotate = <90>;
++                fps = <25>;
++                bgr;
++                buswidth = <8>;
++                dc-gpios = <&gpio3 13 0>;
++                debug = <0>;
++        };
+ };
+ 
+-/* CAN1 (Raspberry PI Expansion header) */
+-&flexcan1 {
++&fec1 {
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi
+index f34a74a..7665bdb 100644
+--- a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi
++++ b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi
+@@ -125,6 +125,12 @@
+ 			>;
+ 		};
+ 
++		pinctrl_pitft: pitftgrp {
++			fsl,pins = <
++				MX6UL_PAD_LCD_DATA08__GPIO3_IO13	0x10b0 /* D/C */
++			>;
++		};
++
+ 		pinctrl_enet1: enet1grp {
+ 			fsl,pins = <
+ 				MX6UL_PAD_GPIO1_IO07__ENET1_MDC		0x1b0b0
+-- 
+2.7.4
+

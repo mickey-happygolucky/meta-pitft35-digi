@@ -1,0 +1,77 @@
+From cea4813801f7b94d900dc1353fb740423777203c Mon Sep 17 00:00:00 2001
+From: Yusuke Mitsuki <mickey.happygolucky@gmail.com>
+Date: Sat, 28 Jan 2017 09:59:26 +0900
+Subject: [PATCH 3/3] dts: add touchscreen device
+
+---
+ arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts | 27 ++++++++++++++++++++++
+ arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi      |  8 ++++---
+ 2 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts
+index acdba12..05ec396 100644
+--- a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts
++++ b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter-id129.dts
+@@ -52,6 +52,33 @@
+                 dc-gpios = <&gpio3 13 0>;
+                 debug = <0>;
+         };
++
++        pitft_ts@1 {
++	    #address-cells = <1>;
++	    #size-cells = <0>;
++            compatible = "st,stmpe610";
++            reg = <1>;
++
++            spi-max-frequency = <500000>;
++            irq-gpio = <&gpio3 12 0x2>; /* IRQF_TRIGGER_FALLING */
++            interrupts = <12 2>; /* high-to-low edge triggered */
++            interrupt-parent = <&gpio3>;
++            interrupt-controller;
++
++            stmpe_touchscreen {
++                compatible = "st,stmpe-ts";
++                st,sample-time = <4>;
++                st,mod-12b = <1>;
++                st,ref-sel = <0>;
++                st,adc-freq = <2>;
++                st,ave-ctrl = <3>;
++                st,touch-det-delay = <4>;
++                st,settling = <2>;
++                st,fraction-z = <7>;
++                st,i-drive = <0>;
++            };
++        };
++
+ };
+ 
+ &fec1 {
+diff --git a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi
+index 7665bdb..f1f4e72 100644
+--- a/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi
++++ b/arch/arm/boot/dts/imx6ul-ccimx6ulstarter.dtsi
+@@ -28,8 +28,9 @@
+ 
+ /* ECSPI3 (Raspberry PI Expansion header) */
+ &ecspi3 {
+-	fsl,spi-num-chipselects = <1>;
+-	cs-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
++	fsl,spi-num-chipselects = <2>;
++	cs-gpios = <&gpio1 20 GPIO_ACTIVE_LOW
++		    &gpio3 14 GPIO_ACTIVE_LOW>;
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_ecspi3>;
+ 	status = "disabled";
+@@ -121,7 +122,8 @@
+ 				MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK	0x10b0
+ 				MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI	0x10b0
+ 				MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO	0x10b0
+-				MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20	0x10b0 /* Chip Select */
++				MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20	0x10b0 /* Chip Select0 */
++				MX6UL_PAD_LCD_DATA09__GPIO3_IO14	0x10b0 /* Chip Select1 */
+ 			>;
+ 		};
+ 
+-- 
+2.7.4
+
